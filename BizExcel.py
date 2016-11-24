@@ -2,12 +2,17 @@
 import xlwings as xw
 import os
 
-income_tag = "PAYBACK" #Income for bank
+target = 0 # 0 for bank, 1 for visa
 
-#D:/jchen/Documents/Biz/TDBizOct2015-Oct2016.xlsx
+statement_sheets = [0,2]
+inflow_tags=["Income","PAYBACK"]
+
+income_tag = inflow_tags[target] #"Income' for bank
+
+
 bk = xw.books[0]
-st = bk.sheets[0] # 0 for bank, 2 for visa
-rng = xw.books[0].sheets[2].range('A1:H250')
+st = bk.sheets[statement_sheets[target]] # 0 for bank, 2 for visa
+rng =st.range('A1:H250')
 dic = {}
 count = 0
 for r in rng.rows:
@@ -16,7 +21,7 @@ for r in rng.rows:
         continue
     (m,d,y) = date.split('/')
     count +=1
-    print count
+    #print count
     key = m + "-" + y
 
     if not key in dic:
@@ -41,7 +46,7 @@ total = 0
 for my, v in sorted(dic.items()):
     for code in v:
         if income_tag == code:
-            print "Income:\t{}\t\t{}".format(my, v[income_tag])
+            print "Inflow:\t{}\t\t{}".format(my, v[income_tag])
             total += v[income_tag]
         else:
             print "Expense:\t{}\t{}\t{}".format(my, code, v[code])
