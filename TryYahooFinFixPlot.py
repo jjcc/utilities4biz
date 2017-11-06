@@ -106,8 +106,8 @@ plt.rc('grid', color='0.75', linestyle='-', linewidth=0.5)
 
 textsize = 9
 left, width = 0.1, 0.8
-rect1 = [left, 0.7, width, 0.2]
-rect2 = [left, 0.3, width, 0.4]
+rect1 = [left, 0.9, width, 0.1]
+rect2 = [left, 0.3, width, 0.6]
 rect3 = [left, 0.1, width, 0.2]
 
 
@@ -126,16 +126,16 @@ rsi = relative_strength(prices)
 fillcolor = 'darkgoldenrod'
 
 ax1.plot(r.date, rsi, color=fillcolor)
-ax1.axhline(70, color=fillcolor)
-ax1.axhline(30, color=fillcolor)
-ax1.fill_between(r.date, rsi, 70, where=(rsi >= 70), facecolor=fillcolor, edgecolor=fillcolor)
-ax1.fill_between(r.date, rsi, 30, where=(rsi <= 30), facecolor=fillcolor, edgecolor=fillcolor)
-ax1.text(0.6, 0.9, '>70 = overbought', va='top', transform=ax1.transAxes, fontsize=textsize)
-ax1.text(0.6, 0.1, '<30 = oversold', transform=ax1.transAxes, fontsize=textsize)
-ax1.set_ylim(0, 100)
-ax1.set_yticks([30, 70])
-ax1.text(0.025, 0.95, 'RSI (14)', va='top', transform=ax1.transAxes, fontsize=textsize)
-ax1.set_title('%s daily' % ticker)
+#ax1.axhline(70, color=fillcolor)
+#ax1.axhline(30, color=fillcolor)
+# ax1.fill_between(r.date, rsi, 70, where=(rsi >= 70), facecolor=fillcolor, edgecolor=fillcolor)
+# ax1.fill_between(r.date, rsi, 30, where=(rsi <= 30), facecolor=fillcolor, edgecolor=fillcolor)
+# ax1.text(0.6, 0.9, '>70 = overbought', va='top', transform=ax1.transAxes, fontsize=textsize)
+# ax1.text(0.6, 0.1, '<30 = oversold', transform=ax1.transAxes, fontsize=textsize)
+# ax1.set_ylim(0, 100)
+# ax1.set_yticks([30, 70])
+# ax1.text(0.025, 0.95, 'RSI (14)', va='top', transform=ax1.transAxes, fontsize=textsize)
+# ax1.set_title('%s daily' % ticker)
 
 # plot the price and volume data
 dx = r.adj_close - r.close
@@ -147,11 +147,13 @@ deltas[1:] = np.diff(prices)
 up = deltas > 0
 ax2.vlines(r.date[up], low[up], high[up], color='black', label='_nolegend_')
 ax2.vlines(r.date[~up], low[~up], high[~up], color='black', label='_nolegend_')
-ma20 = moving_average(prices, 13, type='simple')
-ma200 = moving_average(prices, 32, type='simple')
+ma6 = moving_average(prices, 6, type='exponential')
+ma12 = moving_average(prices, 12, type='exponential')
+ma26 = moving_average(prices, 26, type='exponential')
 
-linema20, = ax2.plot(r.date, ma20, color='blue', lw=2, label='MA (20)')
-linema200, = ax2.plot(r.date, ma200, color='red', lw=2, label='MA (200)')
+linema6, = ax2.plot(r.date, ma6, color='red', lw=1, label='MA (6)')
+linema12, = ax2.plot(r.date, ma12, color='green', lw=1, label='MA (12)')
+linema26, = ax2.plot(r.date, ma26, color='blue', lw=1, label='MA (26)')
 
 
 last = r[-1]
@@ -164,7 +166,7 @@ s = '%s O:%1.2f H:%1.2f L:%1.2f C:%1.2f, V:%1.1fM Chg:%+1.2f' % (
 t4 = ax2.text(0.3, 0.9, s, transform=ax2.transAxes, fontsize=textsize)
 
 props = font_manager.FontProperties(size=10)
-leg = ax2.legend(loc='center left', shadow=True, fancybox=True, prop=props)
+leg = ax2.legend(loc='top left', shadow=True, fancybox=True, prop=props)
 leg.get_frame().set_alpha(0.5)
 
 
