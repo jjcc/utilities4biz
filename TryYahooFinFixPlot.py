@@ -107,7 +107,7 @@ class MyLocator(mticker.MaxNLocator):
         return mticker.MaxNLocator.__call__(self, *args, **kwargs)
 
 
-def draw_graph( input ):
+def draw_graph( input, save_as = "fig.png" ):
     r = mlab.csv2rec(input , delimiter='\t')
     # fh.close()
     r.sort()
@@ -202,7 +202,11 @@ def draw_graph( input ):
     # ax3.yaxis.set_major_locator(mticker.MaxNLocator(5, prune='both'))
     ax2.yaxis.set_major_locator(MyLocator(5, prune='both'))
     ax3.yaxis.set_major_locator(MyLocator(5, prune='both'))
-    plt.show()
+    #plt.show()
+    plt.savefig(save_as)
 
-
-draw_graph( "IHI.csv" )
+tlist = ["XLF", "XLK", "XLE", "XLV", "XLI", "XLY", "XLP", "XLU", "XLB"]
+for t in tlist:
+    of = t + ".png"
+    input = t + ".csv"
+    draw_graph(input, of )
