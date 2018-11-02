@@ -46,10 +46,10 @@ total = 0
 for my, v in sorted(dic.items()):
     for code in v:
         if income_tag == code:
-            print "Inflow:\t{}\t\t{}".format(my, v[income_tag])
+            print( "Inflow:\t{}\t\t{}".format(my, v[income_tag]))
             total += v[income_tag]
         else:
-            print "Expense:\t{}\t{}\t{}".format(my, code, v[code])
+            print( "Expense:\t{}\t{}\t{}".format(my, code, v[code]))
     print "\n"
 
 
