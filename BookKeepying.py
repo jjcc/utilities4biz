@@ -1,6 +1,8 @@
 import pandas as pd
+import numpy as np
 import dotenv
 import os
+import re
 
 # Load .env file
 dotenv.load_dotenv()
@@ -10,12 +12,40 @@ data_dir = os.getenv("DATA_DIR")
 
 # Get the file name from the .env file
 visa_fn = os.getenv("BANK_STMTS")
+bank_sheet = os.getenv("BKS")
+visa_sheet = os.getenv("VSS")
 
 
-vxls_file = pd.ExcelFile(f"{data_dir}/{visa_fn}")
+def parse_xlsx(data_dir, visa_fn, visa_sheet):
+    vxls_file = pd.ExcelFile(f"{data_dir}/{visa_fn}")
 #vxls_file = pd.read_excel(f"{data_dir}/{visa_fn}")
 
-print(vxls_file.sheet_names)
+    print(vxls_file.sheet_names)
 
-#df = vxls_file.parse('Sheet1')
+    df0 = vxls_file.parse(visa_sheet)
+    df = df0.fillna("")
+    cols = df.columns
+    print(cols)
 
+    desc_col = df["Description"]
+    desc_vals = list(desc_col.values)
+
+    desc_vals_p = [x for x in desc_vals if '#' in x or '*' in x]
+    print(df.head())
+
+def remove_trival_chars(s):
+    '''
+    remove the trailing chars like #, *, etc.
+    for example, "BOSTON PIZZA # 432" -> "BOSTON PIZZA"
+    '''
+    m1 = re.search(r'\s*[#|*]', s) 
+    if m1:
+        idx = m1.start()
+        s = s[:idx]
+    return s
+
+
+if __name__ == "__main__":
+    #s = remove_trival_chars("BOSTON PIZZA # 432")
+    #print(s)
+    parse_xlsx(data_dir, visa_fn, visa_sheet)
