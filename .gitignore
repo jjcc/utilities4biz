@@ -4,3 +4,6 @@
 *.gif
 *.txt
 ref/*
+.env
+.venv*/
+data*/
