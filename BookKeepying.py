@@ -27,10 +27,14 @@ def parse_xlsx(data_dir, visa_fn, visa_sheet):
     cols = df.columns
     print(cols)
 
-    desc_col = df["Description"]
-    desc_vals = list(desc_col.values)
+    df["Description"] = df["Description"].apply(remove_trival_chars)
 
-    desc_vals_p = [x for x in desc_vals if '#' in x or '*' in x]
+    desc_col = df["Description"]
+    desc_vals0 = list(desc_col.values)
+    desc_vals = [ x for x in desc_vals0 if "PAYMENT" not in x ]
+    desc_set = set(desc_vals)
+
+    open("desc_vals.txt", "w").write("\n".join(desc_set))
     print(df.head())
 
 def remove_trival_chars(s):
