@@ -16,6 +16,8 @@ bank_sheet = os.getenv("BKS")
 visa_sheet = os.getenv("VSS")
 start_row = 33
 end_row = 193
+#start_row = 38  # visa start
+#end_row = 298   # visa end
 
 def parse_xlsx(data_dir, visa_fn, sheet_name, func = None):
     '''
@@ -63,7 +65,11 @@ def fill_cat(sheet_name, df):
     df.to_csv(f"{sheet_name}_catfilled1.csv")
 
 def get_sums(sheet_name, df):
+    '''
+    Get the sum of the transactions by category
+    '''
     df = df.iloc[start_row:end_row]    
+    df = df[df["Flag"] != "Ignore"]
     df["Outf"] = df["Out"].apply(lambda x: float(x) if x != "" else 0)
     dfgreg = df["Outf"].groupby(df["Code"])
     res = dfgreg.sum()
@@ -71,6 +77,9 @@ def get_sums(sheet_name, df):
     return df
 
 def generate_keys(sheet_name, df):
+    '''
+    Prepare the keys for categorization
+    '''
     df["Description"] = df["Description"].apply(remove_trival_chars)
 
     desc_col = df["Description"]
@@ -95,6 +104,11 @@ def remove_trival_chars(s):
 
 
 if __name__ == "__main__":
+    '''
+    Note: post processing with "fill_cat" function is required to fill the category column
+    before running the "get_sums" function
+    '''
     #parse_xlsx(data_dir, stmts_fn, bank_sheet, func="get_all")
     #parse_xlsx(data_dir, stmts_fn, visa_sheet, func="get_keys")
-    parse_xlsx(data_dir, stmts_fn, visa_sheet)
+    #parse_xlsx(data_dir, stmts_fn, visa_sheet, func="get_sums")
+    parse_xlsx(data_dir, stmts_fn, bank_sheet, func="get_sums")
