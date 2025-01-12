@@ -140,7 +140,7 @@ def remove_trival_chars(s):
     return s
 
 
-def manage_keys(sheet_name):
+def manage_keys(sheet_name, is_visa=True):
     '''
     Manage the keys for categorization
     '''
@@ -149,7 +149,7 @@ def manage_keys(sheet_name):
     dfkeys = pd.DataFrame(keys, columns=["Key"])
     dfkeys["Cat"] = ""
 
-    key_fn_old = f"meta/22-23__Visa22-23_keys.csv"
+    key_fn_old = f"meta/22-23__Visa22-23_keys.csv" if is_visa else f"meta/22-23__Bank22-23_exist_keys.csv"
     dfkeys_old = pd.read_csv(key_fn_old)
     for i, row in dfkeys_old.iterrows():
         key = row["Key"]
