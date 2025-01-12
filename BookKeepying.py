@@ -129,6 +129,8 @@ def remove_trival_chars(s):
     remove the trailing chars like #, *, etc.
     for example, "BOSTON PIZZA # 432" -> "BOSTON PIZZA"
     '''
+    if not isinstance(s, str):
+        s = str(s)
     m1 = re.search(r'\s*[#|*]', s) 
     if m1:
         idx = m1.start()
