@@ -7,3 +7,4 @@ ref/*
 .env
 .venv*/
 data*/
+meta*/

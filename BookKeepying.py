@@ -91,7 +91,7 @@ def get_sums(sheet_name, df):
     res.to_csv(f"{file_prefix}_{sheet_name}_cat_sum.csv")
     return df
 
-def generate_keys(sheet_name:str, df:pd.DataFrame) -> (pd.DataFrame, set):
+def generate_keys(sheet_name:str, df:pd.DataFrame) :
     '''
     Prepare the keys for categorization
     '''
