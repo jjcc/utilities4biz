@@ -115,7 +115,9 @@ def collect_keys(sheet_name, df):
         desc = row["Description"]
         if not isinstance(desc, str):
             continue
-        if row["Flag"] == "Ignore":
+        if 'Flag' in row and row["Flag"] == "Ignore":
+            continue
+        if 'Exclude' in row and row["Exclude"] == "TRUE":
             continue
         desc_breif = remove_trival_chars(desc) 
         if row['Code'] != "":
@@ -147,14 +149,14 @@ def manage_keys(sheet_name):
     dfkeys = pd.DataFrame(keys, columns=["Key"])
     dfkeys["Cat"] = ""
 
-    key_fn_old = f"Visa21-22_keys.csv"
+    key_fn_old = f"meta/22-23__Visa22-23_keys.csv"
     dfkeys_old = pd.read_csv(key_fn_old)
     for i, row in dfkeys_old.iterrows():
         key = row["Key"]
         cat = row["Cat"]
         dfkeys.loc[dfkeys["Key"] == key, "Cat"] = cat
     #dfkeys["SubCat"] = ""
-    dfkeys.to_csv(f"{file_prefix}_{sheet_name}_keys.csv")
+    dfkeys.to_csv(f"{file_prefix}_{sheet_name}_keys.csv", index=False)
 
 # notebook section
 

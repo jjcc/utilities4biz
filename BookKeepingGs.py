@@ -23,6 +23,7 @@ BANK_SHEET= os.getenv("BKS")
 VISA_SHEET = os.getenv("VSS")
 
 current_sheet = VISA_SHEET
+max_rows = 300
 
 def authenticate_and_connect():
     # Path to your service account JSON key file
@@ -91,6 +92,7 @@ worksheet = spreadsheet.worksheet(VISA_SHEET)
 
 
 rows = worksheet.get_all_records()
+rows = rows[:max_rows]
 # put into a dataframe
 df = pd.DataFrame(rows)
 
@@ -100,9 +102,25 @@ df = pd.DataFrame(rows)
 # 2. manage keys
 #manage_keys(current_sheet)
 
+
+# 3. fill the category
 # get the keys
 dict_key_df = pd.read_csv(f"{file_prefix}_{current_sheet}_keys.csv")
 # convert to dictionary with column 'Key' as the key, 'Cat' as the value
 dict_keys = dict_key_df.set_index("Key").T.to_dict('dict')
+#update_sheet(worksheet, rows, dict_keys)
 
-update_sheet(worksheet, rows, dict_keys)
+
+# 4. get the sums
+
+# remove rows that the Out column is empty
+df = df[df["Out"] != ""]
+# removce rows that Exclude column as 'TRUE'
+df = df[df["Exclude"] != "TRUE"]
+
+df["Outf"] = df["Out"].apply(lambda x: float(x.replace('$', '').replace(',', '')) if x != "" else 0)
+df["Outf"] = df["Outf"].round(2)
+dfgreg = df["Outf"].groupby(df["Code"])
+res = dfgreg.sum()
+res = res.round(2)
+res.to_csv(f"{file_prefix}_{current_sheet}_cat_sum.csv")
