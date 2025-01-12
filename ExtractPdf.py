@@ -12,11 +12,11 @@ Process each Visa statement PDF and write the third table to a separate sheet in
 data_folder = "data4bkping/"
 # File paths for the uploaded PDFs
 pdf_files_name = [
-    "TD_BUSINESS_TRAVEL_VISA_6195_Apr_05-2023.pdf",
-    "TD_BUSINESS_TRAVEL_VISA_6195_May_05-2023.pdf",
-    "TD_BUSINESS_TRAVEL_VISA_6195_Jun_05-2023.pdf",
+    #"TD_BUSINESS_TRAVEL_VISA_6195_Apr_05-2023.pdf",
+    #"TD_BUSINESS_TRAVEL_VISA_6195_May_05-2023.pdf",
+    #"TD_BUSINESS_TRAVEL_VISA_6195_Jun_05-2023.pdf",
     "TD_BUSINESS_TRAVEL_VISA_6195_Jul_05-2023.pdf",
-    "TD_BUSINESS_TRAVEL_VISA_6195_Aug_08-2023.pdf"
+    #"TD_BUSINESS_TRAVEL_VISA_6195_Aug_08-2023.pdf"
 ]
 
 pdf_files = [data_folder + pdf_file for pdf_file in pdf_files_name]
@@ -46,13 +46,13 @@ class PdfTableExtracgtor:
         else:
             return None
 
-output_file = data_folder + "consolidated_transaction_tables_v6.xlsx"
+output_file = data_folder + "consolidated_transaction_tables_v7.xlsx"
 def main():
     excel_writer = pd.ExcelWriter(output_file, engine='xlsxwriter')
 
     # Loop through all PDF files except the first one (which we have already processed)
 
-    for i, pdf_file in enumerate(pdf_files[1:]):
+    for i, pdf_file in enumerate(pdf_files[0:]):
         extractor = PdfTableExtracgtor(pdf_file)
         third_table_as_df = extractor.process_third_table()
         regex = r"TD_BUSINESS_TRAVEL_VISA_6195_(\w+_\d{2})-2023.pdf"
