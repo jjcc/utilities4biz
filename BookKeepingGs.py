@@ -21,6 +21,7 @@ data_dir = os.getenv("DATA_DIR")
 # Get the file name from the .env file
 BANK_SHEET= os.getenv("BKS")
 VISA_SHEET = os.getenv("VSS")
+SHEET_ID = os.getenv("SHEET_ID")
 
 is_visa = False
 if is_visa:
@@ -44,7 +45,7 @@ def authenticate_and_connect():
     # Connect to Google Sheets
     gc = gspread.authorize(credentials)
     # Open the spreadsheet by key
-    spreadsheet = gc.open_by_key("1ErAPjFEuGAxFKT2FEPCYgpSewEnNLvIgpOUl8loNBfs")  # Replace with your spreadsheet's key
+    spreadsheet = gc.open_by_key(SHEET_ID) 
 
     return spreadsheet
 
@@ -118,7 +119,7 @@ df = pd.DataFrame(rows)
 #manage_keys(current_sheet)
 
 
-# 3. fill the category
+# 3. fill the category, need to complemet the keys from the manage_keys generated file. Some values of dictionary are empty
 # get the keys
 dict_key_df = pd.read_csv(f"{file_prefix}_{current_sheet}_keys.csv")
 # convert to dictionary with column 'Key' as the key, 'Cat' as the value
@@ -126,7 +127,7 @@ dict_keys = dict_key_df.set_index("Key").T.to_dict('dict')
 #update_sheet(worksheet, rows, dict_keys, is_visa)
 
 
-# 4. get the sums
+# 4. get the sums. For cross checking with the Google Sheet. With step 3, the category column is filled. The calculated sum should be added in sheet
 
 # remove rows that the Out column is empty
 #df = df[df["Out"] != ""]

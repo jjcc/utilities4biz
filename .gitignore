@@ -8,3 +8,6 @@ ref/*
 .venv*/
 data*/
 meta*/
+__pycache__/
+token.*
+client_id.*
