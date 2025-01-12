@@ -5,16 +5,24 @@ import numpy as np
 import dotenv
 import os
 import re
-from BookKeepying import remove_trival_chars, get_sums, generate_keys, collect_keys
+from BookKeepying import remove_trival_chars, get_sums, generate_keys, collect_keys,manage_keys
+'''
+1. Authenticate and connect to Google Sheets, get data
+2. Generate keys
 
+'''
 dotenv.load_dotenv()
 
+fiscal_year = os.getenv("FISCAL_YEAR")
+file_prefix = f"meta/{fiscal_year}_"
 # Get the data directory from the .env file
 data_dir = os.getenv("DATA_DIR")
 
 # Get the file name from the .env file
 BANK_SHEET= os.getenv("BKS")
 VISA_SHEET = os.getenv("VSS")
+
+current_sheet = VISA_SHEET
 
 def authenticate_and_connect():
     # Path to your service account JSON key file
@@ -34,6 +42,48 @@ def authenticate_and_connect():
 
     return spreadsheet
 
+def generate_keys_gs(sheet_name:str, df:pd.DataFrame, end_row) :
+    '''
+    Prepare the keys for categorization
+    '''
+    start_row = 2
+    df = df.iloc[start_row:end_row]    
+    df["Description"] = df["Description"].apply(remove_trival_chars)
+
+    desc_col = df["Description"]
+    desc_vals0 = list(desc_col.values)
+    desc_vals = [ x for x in desc_vals0 if "PAYMENT" not in x ]
+    desc_set = set(desc_vals)
+    open(f"{file_prefix}_{sheet_name}_keys.txt", "w").write("\n".join(desc_set))
+    return df, desc_set
+
+def update_sheet(sheet, rows, dict_keys):
+    '''
+    update the sheet with the category
+    '''
+    cat_list = []
+    row_start = 2
+    for idx, row in enumerate(rows):
+        row_no = idx + 2 # header occupies 1, base 0 instead of 1. So the  add 2
+        spend = row["Out"]
+        if spend == "":
+            cat_list.append([""])
+            continue
+        exclude = row["Exclude"] if "Exclude" in row else ""
+        if exclude == "TRUE":
+            cat_list.append([""])
+            continue
+    #print(f"idx {idx}, RowNo {row_no}: {description}, spend: {spend}")
+        desc_brief = remove_trival_chars(row["Description"])
+    # get the category
+        cat = dict_keys[desc_brief]["Cat"] if desc_brief in dict_keys else "Unknown"
+    # update the 
+        cat_list.append([cat])
+
+
+    cell_range = f"J{row_start}:J{row_no}" # for VISA
+    sheet.update(cell_range, cat_list)
+
 spreadsheet = authenticate_and_connect()
 
 # Select a worksheet by title or index
@@ -44,16 +94,15 @@ rows = worksheet.get_all_records()
 # put into a dataframe
 df = pd.DataFrame(rows)
 
-for idx, row in enumerate(rows):
-    description = row["Description"]
-    row_no = idx + 2 # header occupies 1, base 0 instead of 1. So the  add 2
-    spend = row["Out"]
-    if spend == "":
-        continue
-    print(f"idx {idx}, RowNo {row_no}: {description}, spend: {spend}")
-    #print(row)
-    if idx > 100:
-        break
+# 1. generate keys
+# df, desc_set = generate_keys_gs(VISA_SHEET, df, 1000)
 
-# Write data
-#worksheet.update('A1', 'Hello, Google Sheets!')  # Update cell A1 with new data
+# 2. manage keys
+#manage_keys(current_sheet)
+
+# get the keys
+dict_key_df = pd.read_csv(f"{file_prefix}_{current_sheet}_keys.csv")
+# convert to dictionary with column 'Key' as the key, 'Cat' as the value
+dict_keys = dict_key_df.set_index("Key").T.to_dict('dict')
+
+update_sheet(worksheet, rows, dict_keys)
